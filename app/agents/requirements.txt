@@ -1,0 +1,22 @@
+# Context Manager Agent System Dependencies
+
+# Core LlamaIndex packages
+llama-index-core>=0.14.0
+llama-index-llms-openai>=0.8.0
+llama-index-workflows>=2.14.0
+
+# GitHub API
+PyGithub>=2.0.0
+
+# Environment management
+python-dotenv>=1.0.0
+
+# OpenAI (required by llama-index-llms-openai)
+openai>=1.0.0
+
+# Async support (usually included with Python 3.7+, but listed for clarity)
+# asyncio is part of Python standard library
+
+# Type checking and validation (optional but recommended for development)
+# mypy>=1.0.0
+# pylint>=2.17.0
