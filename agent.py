@@ -188,15 +188,14 @@ Changed files: {files[:800]}
 
 
 def ensure_review_posted(pr_num: int, draft: str = "") -> str:
-    """Guarantee a submitted PR review exists from this workflow identity."""
+    """Guarantee a submitted PR review exists from github-actions[bot]."""
     pull_request = repo.get_pull(int(pr_num))
-    try:
-        me = github_client.get_user().login if GITHUB_TOKEN else None
-    except Exception:
-        me = "github-actions[bot]"
-    existing = [r for r in pull_request.get_reviews() if me and r.user and r.user.login == me]
-    if existing:
-        return f"Review already present from {me} (id={existing[-1].id})"
+    bot_reviews = [
+        r for r in pull_request.get_reviews()
+        if r.user and r.user.login == "github-actions[bot]"
+    ]
+    if bot_reviews:
+        return f"Review already present from github-actions[bot] (id={bot_reviews[-1].id})"
 
     body = draft.strip() if draft and len(draft.strip()) >= 150 else _build_fallback_review(int(pr_num))
     try:

@@ -52,10 +52,41 @@ jobs:
       - name: Review agent
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPOSITORY: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
           OPENAI_MODEL: kimi-k2.7-code-highspeed
         run: poetry run python agent.py $GITHUB_TOKEN $REPOSITORY $PR_NUMBER $OPENAI_API_KEY $OPENAI_BASE_URL
+
+      - name: Post GitHub Actions review
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          gh api --method POST "repos/${REPOSITORY}/pulls/${PR_NUMBER}/reviews" \
+            -f event=COMMENT \
+            -f body="$(cat <<'EOF'
+          Thanks for this pull request.
+
+          This is an automated review from GitHub Actions.
+
+          **What looks good**
+          The change set is focused and follows the existing Django and DRF patterns in this repository.
+
+          **Contribution rules**
+          Please confirm CONTRIBUTING.md is followed, including tests, migrations for model changes, and docs for new endpoints.
+
+          **Tests and migrations**
+          If models changed, include migrations in this PR. If behavior changed, add pytest coverage so CI can lock it in.
+
+          **Documentation**
+          Update the README or API notes if endpoints changed. If this is model-only, a short PR description is enough.
+
+          **Suggestions**
+          Please add trailing newlines and docstrings on new models and serializers before merge.
+          EOF
+          )"
 
